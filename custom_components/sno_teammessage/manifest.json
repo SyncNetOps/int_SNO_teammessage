@@ -1,0 +1,14 @@
+{
+  "domain": "sno_teammessage",
+  "name": "SNO - TeamMessage",
+  "codeowners": ["@SyncNetOps"],
+  "config_flow": true,
+  "dependencies": ["webhook"],
+  "documentation": "https://sno.mb222.de/faq-tm/",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/SyncNetOps/int_SNO_teammessage/issues",
+  "requirements": [],
+  "version": "1.1.0",
+  "description": "Vollumfängliche, fehlertolerante Integration für den Multikanal-Nachrichtendienst TeamMessage.de."
+}

@@ -1,0 +1,78 @@
+
+# custom_components/sno_teammessage/services.yaml
+send_message:
+  name: "Nachricht senden (Multi-Kanal)"
+  description: "Sendet eine Nachricht über TeamMessage an eine direkte Nummer oder eine Teamliste."
+  fields:
+    message:
+      name: "Nachricht"
+      description: "Der Text der Nachricht (max. 1600 Zeichen)."
+      example: "Wassermelder im Keller hat ausgelöst!"
+      required: true
+      selector:
+        text:
+          multiline: true
+    to_mobile:
+      name: "Zielrufnummer (Direkt)"
+      description: "Einzelne Handynummer für direkten SMS-Versand (z.B. +491701234567)."
+      required: false
+      selector:
+        text:
+    teamlist_email:
+      name: "Teamliste (Zwingend erforderlich)"
+      description: "Die Adresse (z.B. meinteam@tmsg.de) oder die ID der Teamliste. Wird für Abrechnung und Routing zwingend benötigt, auch bei Direktnachrichten."
+      example: "meinteam@tmsg.de"
+      required: true
+      selector:
+        text:
+    sender_email:
+      name: "Absender E-Mail (Geschlossene Gruppe)"
+      description: "NUR die reine E-Mail Adresse (z.B. user@gmail.com). Keine Keywords hier eintragen!"
+      example: "user@gmail.com"
+      required: false
+      selector:
+        text:
+    keyword:
+      name: "Keyword / Passwort"
+      description: "Das Keyword für geschlossene Gruppen (z.B. SMSAlarm). Die Integration fügt es automatisch korrekt formatiert vor deine Nachricht ein."
+      example: "SMSAlarm"
+      required: false
+      selector:
+        text:
+    from_mobile:
+      name: "Absenderkennung (Optional)"
+      description: "Überschreibt den Absender (max. 11 Zeichen, alphanumerisch)."
+      required: false
+      selector:
+        text:
+    date:
+      name: "Datum (Geplant)"
+      description: "Format: YYYY-MM-DD"
+      required: false
+      selector:
+        text:
+    time:
+      name: "Uhrzeit (Geplant)"
+      description: "Format: HH:MM"
+      required: false
+      selector:
+        text:
+    flash:
+      name: "Flash-Nachricht"
+      description: "Erscheint direkt auf dem Display (nur SMS)."
+      default: false
+      selector:
+        boolean:
+    test:
+      name: "Test-Modus"
+      description: "Simuliert den Versand, ohne Guthaben zu verbrauchen."
+      default: false
+      selector:
+        boolean:
+    ucs2:
+      name: "Unicode / Emojis (UCS-2)"
+      description: "Erzwingt UCS-2 Codierung für Sonderzeichen."
+      default: false
+      selector:
+        boolean:
+

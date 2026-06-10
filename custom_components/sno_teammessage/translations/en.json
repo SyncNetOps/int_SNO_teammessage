@@ -1,0 +1,38 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "TeamMessage konfigurieren",
+        "description": "Gib deine Team-ID und deinen Bearer-Token ein, um die Integration zu verknüpfen.",
+        "data": {
+          "team_id": "Team-ID (Kundennummer)",
+          "bearer_token": "API Bearer Token"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zur TeamMessage API fehlgeschlagen.",
+      "invalid_auth": "Zugangsdaten abgelehnt. Bitte Token prüfen.",
+      "invalid_team_id": "Die angegebene Team-ID ist ungültig.",
+      "account_not_found": "Team-Account wurde nicht gefunden.",
+      "rate_limit_exceeded": "API Rate-Limit überschritten. Bitte kurz warten.",
+      "unknown": "Ein unerwarteter Fehler ist aufgetreten."
+    },
+    "abort": {
+      "already_configured": "Dieses TeamMessage-Konto ist bereits konfiguriert."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Smarte Fallbacks konfigurieren",
+        "description": "Diese Einstellungen werden als Fallback genutzt, falls Parameter bei einem Sende-Aufruf weggelassen werden.",
+        "data": {
+          "default_teamlist": "Standard Teamliste (ID oder E-Mail)",
+          "default_sender_email": "Standard Absender-E-Mail (für geschlossene Gruppen)",
+          "default_keyword": "Standard Keyword (für Auth)"
+        }
+      }
+    }
+  }
+}
