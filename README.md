@@ -95,7 +95,6 @@ Wähle eine Karte aus. Im visuellen Editor kannst du nun den Titel anpassen und 
 
 Nachrichten werden über den Dienst `sno_teammessage.send_message` verschickt. Der Dienst unterscheidet sauber zwischen Direktversand (`target_type: direct`) und Gruppenversand (`target_type: list`).
 
-[![Dienst aufrufen](https://my.home-assistant.io/badges/developer_call_service.svg)](https://my.home-assistant.io/redirect/developer_call_service/)
 
 ### Beispiel: Direktnachricht (SMS) bei Alarm
 Sendet eine direkte SMS an eine spezifische Handynummer.
