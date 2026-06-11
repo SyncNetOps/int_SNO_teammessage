@@ -114,7 +114,7 @@ Die Integration erstellt automatisch nützliche Entitäten, die zyklisch (alle 5
 * **sensor.sno_teammessage_<team_id>_credit: Aktuell verfügbares SMS/Voice Guthaben.
 * **sensor.sno_teammessage_<team_id>_used: Summe der bisher gesendeten Nachrichten.
 * **sensor.sno_teammessage_<team_id>_tariff: Aktueller Tarif-Status (z.B. EASY, PAUSCHAL).
-
+*
 
 ### 🐛 Fehlerbehebung / Support
 
@@ -128,8 +128,15 @@ Für ausführliche Hilfestellungen besuche unsere Offizielle FAQ & Dokumentation
 
 Wenn du einen Bug gefunden hast, erstelle gerne ein Issue:
 👉 Issue auf GitHub melden (https://github.com/SyncNetOps/int_SNO_teammessage/issues)
+=======
+# SNO - TeamMessage Integration für Home Assistant
+>>>>>>> 7ca8d46a4ea8878e083d90979e32a588c8a87a75
 
+[![GitHub Release](https://img.shields.io/github/v/release/SyncNetOps/int_SNO_teammessage?style=for-the-badge)](https://github.com/SyncNetOps/int_SNO_teammessage/releases)
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
+<<<<<<< HEAD
 ## 📚 Umfassende Dokumentation (Release v1.1.1)
 
 Für tiefergehende Informationen zu Updates, technischen Hintergründen, API-Spezifikationen und detaillierten Nutzungsszenarien stehen im Repository umfangreiche Dokumentationen zur Verfügung. 
@@ -146,3 +153,35 @@ Diese befinden sich im Ordner `/Docs/V1.1.1/`:
     Tiefe Einblicke in die Hub-Architektur, Endpunkte und Service-Calls – ideal für Entwickler von Custom Lovelace Cards.
 *   📖 **[Ausführliche Anwenderanleitung](Docs/V1.1.1/Anwenderanleitung.md)**  
     Ein kompletter Schritt-für-Schritt-Guide für Installation, Einrichtung, das Panel und fortgeschrittene Automatisierungen.
+=======
+Eine vollumfängliche, fehlertolerante Home Assistant Integration für den professionellen Multikanal-Nachrichtendienst **[TeamMessage.de](https://www.teammessage.de)**. 
+
+Diese Integration ermöglicht dir den hochzuverlässigen Versand von Nachrichten über SMS, Voice-Anrufe (Text-to-Speech) und Push-Benachrichtigungen direkt aus deinem Smart Home heraus. Sie nutzt die moderne REST-API (v1.1.0) des Anbieters mit Bearer-Token-Authentifizierung und bietet ein atemberaubendes Frontend zur Verwaltung.
+
+**Entwickler:** [SyncNetOps](https://github.com/SyncNetOps)  
+**Offizielle FAQ & Dokumentation:** [SNO TeamMessage Doku](https://sno.mb222.de/faq-tm/)
+
+## ✨ Highlights & Features
+* 🎨 **Modernes Glassmorphism-Panel:** Eine reaktionsschnelle Single Page Application (SPA) direkt in deiner Home Assistant Seitenleiste.
+* 👥 **Vollwertiges Kontakt-Management:** Synchronisiere, erstelle und bearbeite deine TeamMessage-Kontakte und Teamlisten, ohne HA verlassen zu müssen.
+* 🛡 **Smart Fallbacks & Auto-Korrektur:** Falsch formatierte Handynummern (`0170...` statt `+49170...`)? Die Integration korrigiert Nummern in Echtzeit und füllt fehlende Daten aus deinen globalen Einstellungen auf.
+* 📊 **Dashboard Custom Cards:** Wunderschöne, per UI konfigurierbare Lovelace-Karten für Guthaben, Logbuch und Schnellversand.
+* 🔍 **Echtzeit-Logbuch:** Detailliertes, durchsuchbares Protokoll mit Auto-Refresh-Funktion, Fehlercodes und Zustellberichten.
+
+## 🚀 Schnellstart
+
+1. Erstelle einen Account auf [teammessage.eu/registrieren](https://teammessage.eu/registrieren) (inkl. 20 Frei-SMS).
+2. Generiere im TeamMessage Portal einen **API-Token (Bearer Token)**.
+3. Installiere diese Integration über **HACS** (Benutzerdefiniertes Repository).
+4. Gehe in Home Assistant zu **Einstellungen -> Geräte & Dienste**, füge `SNO - TeamMessage` hinzu und gib deine Team-ID sowie den Token ein.
+
+## 📚 Dokumentation
+Alle weiteren Informationen, detaillierte YAML-Beispiele und Hilfe bei der Einrichtung findest du in unseren beiliegenden Dokumenten:
+* [Installationsanleitung](https://github.com/SyncNetOps/int_SNO_teammessage/blob/main/Docs/V1.1.0/Installationsanleitung.md)
+* [Benutzerhandbuch](https://github.com/SyncNetOps/int_SNO_teammessage/blob/main/Docs/V1.1.0/Benutzerhandbuch.md)
+* [FAQ (Häufig gestellte Fragen)](https://github.com/SyncNetOps/int_SNO_teammessage/blob/main/Docs/V1.1.0/FAQ.md)
+* [Entwickler-Dokumentation](https://github.com/SyncNetOps/int_SNO_teammessage/blob/main/Docs/V1.1.0/Entwickler-Dokumentation.md)
+
+---
+*Hinweis: Dies ist eine Drittanbieter-Integration zur Nutzung eines API-Dienstes. Für den reellen Versand von SMS und Sprachanrufen fallen entsprechende Nutzungsgebühren beim Dienstanbieter TeamMessage.de an.*
+>>>>>>> 7ca8d46a4ea8878e083d90979e32a588c8a87a75
