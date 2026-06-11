@@ -143,7 +143,7 @@ Die Integration stellt dir out-of-the-box Sensoren zur Verfügung, die du auf je
 
 Der Hauptzweck dieser Integration ist es, dich automatisch über Ereignisse in deinem Smart Home zu informieren. Dies geschieht über den Dienst `sno_teammessage.send_message`.
 
-[![Dienst aufrufen](https://my.home-assistant.io/badges/developer_call_service.svg)](https://my.home-assistant.io/redirect/developer_call_service/)
+
 
 ### Vollständige Tabelle aller Eingabefelder (Parameter)
 
