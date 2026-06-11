@@ -9,6 +9,6 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/SyncNetOps/int_SNO_teammessage/issues",
   "requirements": [],
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Vollumfängliche, fehlertolerante Integration für den Multikanal-Nachrichtendienst TeamMessage.de."
 }

@@ -1,4 +1,4 @@
-# custom_components/sno_teammessage/coordinator.py | v1.1.0
+# custom_components/sno_teammessage/coordinator.py || V1.1.1
 """DataUpdateCoordinator for SNO - TeamMessage."""
 import logging
 from datetime import timedelta

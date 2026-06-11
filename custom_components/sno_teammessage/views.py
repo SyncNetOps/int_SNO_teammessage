@@ -1,4 +1,4 @@
-# custom_components/sno_teammessage/views.py | v1.1.0
+# custom_components/sno_teammessage/views.py || V1.1.1
 """HTTP Views providing a secure proxy for the Glassmorphism SPA."""
 import logging
 from aiohttp import web
@@ -40,17 +40,14 @@ class TeamMessageApiView(HomeAssistantView):
         entry = entries[0]
         client = self.hass.data[DOMAIN][entry.entry_id]["client"]
         
-        # Hole alle Parameter aus der URL
         query_params = dict(request.query)
         endpoint = query_params.pop("endpoint", "")
 
         if not endpoint:
             return self.json_message("Fehlender Parameter 'endpoint'", status_code=400)
 
-        # Bereinigter Endpunkt für die Auswertung (ohne Schrägstriche)
         clean_endpoint = endpoint.strip("/")
 
-        # --- LOKALES OPTIONS-ROUTING ---
         if clean_endpoint == "options":
             if method == "GET":
                 return self.json(dict(entry.options))
@@ -61,10 +58,7 @@ class TeamMessageApiView(HomeAssistantView):
                 self.hass.config_entries.async_update_entry(entry, options=new_options)
                 return self.json({"success": True})
             return self.json_message("Methode nicht erlaubt", status_code=405)
-        # -------------------------------
 
-        # --- EXTERNES API ROUTING ---
-        # Stelle sicher, dass immer exakt ein Slash eingefügt wird
         if not endpoint.startswith("/"):
             endpoint = f"/{endpoint}"
             
@@ -75,8 +69,7 @@ class TeamMessageApiView(HomeAssistantView):
                 response_data = await client._request("GET", api_url, params=query_params)
             else:
                 body = await request.json() if request.can_read_body else {}
-                # Gebe zwingend auch params mit, da die TeamMessage API bei PUT/DELETE Parameter in der URL verlangt!
-                response_data = await client._request(method, api_url, data=body, params=query_params)
+                response_data = await client._request(method, api_url, json=body, params=query_params)
 
             return self.json(response_data)
 

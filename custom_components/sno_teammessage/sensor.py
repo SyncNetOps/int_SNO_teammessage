@@ -1,4 +1,4 @@
-# custom_components/sno_teammessage/sensor.py | v1.1.0
+# custom_components/sno_teammessage/sensor.py || V1.1.1
 """Sensor platform for SNO - TeamMessage."""
 import logging
 from typing import Any, Dict
@@ -37,7 +37,7 @@ class TeamMessageBaseSensor(CoordinatorEntity, SensorEntity):
             "identifiers": {(DOMAIN, self._team_id)},
             "name": f"{NAME} ({self._team_id})",
             "manufacturer": MANUFACTURER,
-            "sw_version": "1.1.0",
+            "sw_version": "1.1.1",
         }
 
 class TeamMessageCreditSensor(TeamMessageBaseSensor):

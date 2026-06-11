@@ -1,4 +1,4 @@
-# custom_components/sno_teammessage/api.py | v1.1.0
+# custom_components/sno_teammessage/api.py || V1.1.1
 """API Client for SNO - TeamMessage."""
 import logging
 import asyncio
@@ -19,7 +19,7 @@ class TeamMessageAuthError(Exception): pass
 class TeamMessageConnectionError(Exception): pass
 
 class TeamMessageApiClient:
-    """API Client to interact with the TeamMessage.de REST API v1.1.0."""
+    """API Client to interact with the TeamMessage.de REST API v1.1.1."""
 
     def __init__(self, team_id: str, bearer_token: str, session: aiohttp.ClientSession) -> None:
         self._team_id = int(team_id)
@@ -38,10 +38,35 @@ class TeamMessageApiClient:
         kwargs["params"] = params
 
         if method.upper() in ["POST", "PUT", "DELETE"]:
-            raw_data = kwargs.pop("data", {})
-            raw_data["tm"] = self._team_id
-            raw_data["team_id"] = self._team_id
-            kwargs["json"] = raw_data
+            req_data = kwargs.pop("data", {})
+            req_json = kwargs.pop("json", {})
+            
+            payload = {}
+            if isinstance(req_data, dict) and req_data:
+                payload.update(req_data)
+            if isinstance(req_json, dict) and req_json:
+                payload.update(req_json)
+
+            if method.upper() == "PUT" and "/contacts/" in url:
+                if "data" not in payload:
+                    payload["data"] = {}
+                try:
+                    contact_id = payload["data"].get("id", url.split("/")[-1])
+                    existing = await self._request("GET", f"/contacts/{contact_id}")
+                    if existing and "data" in existing:
+                        for key in ["mb", "name", "channel"]:
+                            if key not in payload["data"] or payload["data"][key] in [None, ""]:
+                                if key in existing["data"] and existing["data"][key]:
+                                    payload["data"][key] = existing["data"][key]
+                except Exception as e:
+                    _LOGGER.warning(f"Auto-heal failed for contact {url}: {e}")
+
+                if "mb" not in payload["data"] or payload["data"]["mb"] is None:
+                    payload["data"]["mb"] = ""
+
+            payload["tm"] = self._team_id
+            payload["team_id"] = self._team_id
+            kwargs["json"] = payload
 
         try:
             async with self._session.request(method, url, headers=self._headers, **kwargs) as response:
@@ -85,3 +110,15 @@ class TeamMessageApiClient:
 
     async def send_message(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         return await self._request("POST", ENDPOINT_SMS_SEND, data=payload, timeout=aiohttp.ClientTimeout(total=20))
+
+    async def get_teamlist_members(self, list_target: Any) -> Dict[str, Any]:
+        """Holt alle Mitglieder einer Teamliste sicher ab."""
+        url = ENDPOINT_SMS_SEND.replace("sms/send/", "teamlist/members/")
+        params = {}
+        target_str = str(list_target).strip()
+        if target_str.isdigit():
+            params["tl"] = int(target_str)
+        else:
+            params["teamlist_email"] = target_str
+            
+        return await self._request("GET", url, params=params, timeout=aiohttp.ClientTimeout(total=15))

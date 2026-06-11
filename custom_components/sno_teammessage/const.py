@@ -1,4 +1,4 @@
-# custom_components/sno_teammessage/const.py | v1.1.0
+# custom_components/sno_teammessage/const.py || V1.1.1
 """Constants for the SNO - TeamMessage integration."""
 
 DOMAIN = "sno_teammessage"
@@ -27,7 +27,7 @@ UPDATE_INTERVAL_MINUTES = 5
 # Event Names
 EVENT_INCOMING_MESSAGE = "sno_teammessage_incoming"
 
-# Custom API Error Map (REST API v1.1.0)
+# Custom API Error Map (REST API v1.1.1)
 API_ERROR_MAP = {
     -1: "invalid_team_id",         
     -2: "invalid_teamlist_email",  

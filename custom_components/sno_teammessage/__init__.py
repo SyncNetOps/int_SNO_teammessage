@@ -1,4 +1,4 @@
-# custom_components/sno_teammessage/__init__.py | v1.1.0
+# custom_components/sno_teammessage/__init__.py || V1.1.1
 """The SNO - TeamMessage integration."""
 import logging
 import os

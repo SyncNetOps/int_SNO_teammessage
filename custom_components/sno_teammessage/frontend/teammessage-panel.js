@@ -1,4 +1,4 @@
-// custom_components/sno_teammessage/frontend/teammessage-panel.js | v1.1.0
+// custom_components/sno_teammessage/frontend/teammessage-panel.js || V1.1.1
 class TeamMessagePanel extends HTMLElement {
     set hass(hass) {
         this._hass = hass;
@@ -10,12 +10,7 @@ class TeamMessagePanel extends HTMLElement {
             this.currentContacts = [];
             this._loadedOptions = {};
             
-            // Neue Logbuch Einstellungen
-            this.logSettings = {
-                autoRefresh: false,
-                interval: 30000,
-                limit: 50
-            };
+            this.logSettings = { autoRefresh: false, interval: 30000, limit: 50 };
             this.logTimer = null;
 
             this.render();
@@ -28,7 +23,7 @@ class TeamMessagePanel extends HTMLElement {
         await Promise.all([
             this.fetchTeamlists(),
             this.fetchDashboardInfo(),
-            this.fetchLogs(true), // Silent fetch
+            this.fetchLogs(true),
             this.fetchOptions()
         ]);
         this.switchTab(this.currentTab);
@@ -36,9 +31,7 @@ class TeamMessagePanel extends HTMLElement {
     }
 
     disconnectedCallback() {
-        if (this.logTimer) {
-            clearInterval(this.logTimer);
-        }
+        if (this.logTimer) clearInterval(this.logTimer);
     }
 
     render() {
@@ -127,6 +120,12 @@ class TeamMessagePanel extends HTMLElement {
                 .toast-info { background: var(--info-color, #2196f3); }
                 .toast-success { background: var(--success-color, #4caf50); }
                 .toast-error { background: var(--error-color, #f44336); }
+                
+                .auth-box {
+                    background: rgba(var(--rgb-primary-color, 33, 150, 243), 0.1);
+                    padding: 15px; border-radius: 8px; border-left: 3px solid var(--primary-color);
+                    margin-top: 10px; margin-bottom: 20px;
+                }
             </style>
             
             <div id="toast"></div>
@@ -159,12 +158,10 @@ class TeamMessagePanel extends HTMLElement {
             <div id="log-settings-modal" class="modal-overlay">
                 <div class="modal-content">
                     <h3 style="margin-top:0;">Logbuch Einstellungen</h3>
-                    
                     <label style="display:flex; align-items:center; cursor:pointer; margin-bottom: 15px;">
                         <input type="checkbox" id="log-opt-auto" style="width:auto; margin:0 10px 0 0;">
                         Automatisch aktualisieren
                     </label>
-                    
                     <label>Aktualisierungsintervall</label>
                     <select id="log-opt-interval">
                         <option value="10000">10 Sekunden</option>
@@ -172,10 +169,8 @@ class TeamMessagePanel extends HTMLElement {
                         <option value="60000">1 Minute</option>
                         <option value="300000">5 Minuten</option>
                     </select>
-                    
                     <label>Anzahl der Einträge (max. 1000)</label>
                     <input type="number" id="log-opt-limit" min="1" max="1000" placeholder="50">
-                    
                     <div style="display:flex; justify-content:flex-end; gap:10px; margin-top: 20px;">
                         <button class="btn-secondary" id="btn-log-modal-cancel">Schließen</button>
                         <button class="btn-primary" id="btn-log-modal-save">Übernehmen</button>
@@ -190,7 +185,7 @@ class TeamMessagePanel extends HTMLElement {
                 </button>
                 <div style="flex-grow:1; display:flex; justify-content:space-between; align-items:center;">
                     <h1 style="margin:0;">SNO TeamMessage</h1>
-                    <small>v1.1.0</small>
+                    <small>v1.1.1</small>
                 </div>
             </div>
 
@@ -233,11 +228,23 @@ class TeamMessagePanel extends HTMLElement {
                             <option value="list">An Teamliste / Gruppe</option>
                             <option value="direct">Direkt an Handynummer</option>
                         </select>
+                        
                         <label>Ziel (Teamliste oder Nummer)</label>
                         <div id="target-wrapper">
                             <select id="send-target-list"></select>
                         </div>
+
+                        <!-- Zusätzliche Felder für geschlossene Gruppen (Keyword & Sender Email) -->
+                        <div id="list-auth-fields" class="auth-box">
+                            <h4 style="margin-top:0; margin-bottom:10px;">Zusätzliche Listen-Authentifizierung</h4>
+                            <label style="font-size:0.9rem;">Keyword / Passwort (für die Liste)</label>
+                            <input type="text" id="send-keyword" placeholder="z.B. SMSAlarm" style="margin-bottom:10px; padding:8px;">
+                            
+                            <label style="font-size:0.9rem;">Absender E-Mail (bei geschlossenen Gruppen)</label>
+                            <input type="email" id="send-sender" placeholder="z.B. admin@meinteam.de" style="margin-bottom:0; padding:8px;">
+                        </div>
                     </div>
+                    
                     <div>
                         <label>Bevorzugter Kanal (Ignoriert bei Gruppen)</label>
                         <select id="send-channel">
@@ -245,7 +252,7 @@ class TeamMessagePanel extends HTMLElement {
                             <option value="voice">Sprachanruf (Voice)</option>
                         </select>
                         <label>Nachricht</label>
-                        <textarea id="send-msg" rows="4" placeholder="Dein Text..."></textarea>
+                        <textarea id="send-msg" rows="6" placeholder="Dein Text..."></textarea>
                     </div>
                 </div>
                 <button class="btn-primary" id="btn-send" style="width:100%; margin-top:10px;">Jetzt Senden</button>
@@ -290,10 +297,10 @@ class TeamMessagePanel extends HTMLElement {
             <!-- Tab: Einstellungen -->
             <div id="tab-settings" class="tab-content glass">
                 <h2>Smarte Fallbacks (Globale Einstellungen)</h2>
-                <p>Diese Werte werden von der Integration verwendet, wenn in Automatisierungen Parameter weggelassen werden.</p>
+                <p>Diese Werte werden als Standard verwendet, wenn du in YAML-Automatisierungen keine explizite Liste oder E-Mail angibst.</p>
                 <div class="grid-2">
                     <div>
-                        <label>Standard Teamliste (Abrechnungskontext)</label>
+                        <label>Standard Teamliste (Abrechnungskontext & Gruppen)</label>
                         <select id="opt-teamlist"></select>
                         
                         <label>Standard Authentifizierungs-Keyword</label>
@@ -321,12 +328,11 @@ class TeamMessagePanel extends HTMLElement {
                         <a href="https://github.com/SyncNetOps/int_SNO_teammessage/tree/main" target="_blank" style="text-decoration: none;">
                             <span style="background: #333; color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: flex; align-items: center; gap: 5px;">
                                 <svg style="width:16px;height:16px" viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.29,6.96 11.15,6.86 12,6.86C12.85,6.86 13.71,6.96 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z" /></svg>
-                                v1.1.0
+                                v1.1.1
                             </span>
                         </a>
                     </div>
                 </div>
-
                 <div style="margin-top: 25px;">
                     <p><strong>Die Integration:</strong> Diese Home Assistant Integration verbindet dein Smart Home sicher mit dem professionellen Multi-Channel-Nachrichtendienst <a href="https://www.teammessage.de" target="_blank" style="color:var(--primary-color);">TeamMessage.de</a> über deren moderne REST-API. Sie ermöglicht den zuverlässigen Versand von SMS, Sprachanrufen (Voice) und E-Mails direkt aus deinen HA-Automatisierungen (über den Dienst <code>sno_teammessage.send_message</code>).</p>
                     <p><strong>Wo finde ich was im Panel?</strong><br>
@@ -336,71 +342,29 @@ class TeamMessagePanel extends HTMLElement {
                     - <strong>Kontakte:</strong> Verwalte deine Teamlisten und Empfänger direkt in Home Assistant.<br>
                     - <strong>Einstellungen:</strong> Konfiguriere "Smarte Fallbacks" (Standard-Teamliste, Absender, Keywords), um deine YAML-Automatisierungen sauber zu halten.</p>
                 </div>
-
                 <hr style="border: 0; height: 1px; background: var(--divider-color); margin: 30px 0;">
-
-                <h3>Der Drittanbieter: TeamMessage.de</h3>
-                <p>Bitte beachte, dass dies eine API-Integration für einen <strong>Drittanbieter-Dienst</strong> ist. Für den reellen Versand von SMS und Sprachanrufen fallen entsprechende Kosten beim Anbieter an.</p>
-                
-                <div class="grid-3">
-                    <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px;">
-                        <h4 style="margin-top:0; color:var(--primary-color);">EASY (Prepaid)</h4>
-                        <p style="font-size: 0.9rem; margin-bottom: 0;">Volle Kostenkontrolle ohne Grundgebühr. Du lädst dein Guthaben vorab auf (SMS ab 9ct, Voice ab 27ct). Keine Mindestabnahme.</p>
-                    </div>
-                    <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px;">
-                        <h4 style="margin-top:0; color:var(--primary-color);">PAUSCHAL (Flatrate)</h4>
-                        <p style="font-size: 0.9rem; margin-bottom: 0;">Monatliches Fix-Kontingent an Nachrichten. Ideal für Unternehmen und planbare Intensivnutzer.</p>
-                    </div>
-                    <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px;">
-                        <h4 style="margin-top:0; color:var(--primary-color);">PROFI (Postpaid)</h4>
-                        <p style="font-size: 0.9rem; margin-bottom: 0;">Bequeme monatliche Abrechnung im Nachhinein für professionelle und große Umgebungen.</p>
-                    </div>
-                </div>
-
-                <div style="margin-top: 25px; background: rgba(var(--rgb-primary-color, 33, 150, 243), 0.1); padding: 20px; border-radius: 12px; border-left: 4px solid var(--primary-color);">
-                    <h3 style="margin-top: 0;">Erste Schritte / Registrierung</h3>
-                    <ol style="margin-bottom: 0; padding-left: 20px; line-height: 1.6;">
-                        <li>Registriere dich kostenlos unter <a href="https://teammessage.eu/registrieren" target="_blank" style="color:var(--primary-color); font-weight:bold;">teammessage.eu/registrieren</a> (Du erhältst 20 kostenlose Test-SMS).</li>
-                        <li>Erstelle im TeamMessage-Portal im Bereich Einstellungen einen <strong>API-Token (Bearer Token)</strong>.</li>
-                        <li>Hinterlege in Home Assistant unter Integrationen deine Team-ID und den generierten API-Token.</li>
-                    </ol>
-                </div>
-
-                <hr style="border: 0; height: 1px; background: var(--divider-color); margin: 30px 0;">
-
                 <h3>Hilfe & Support</h3>
                 <div style="display:flex; gap: 15px; flex-wrap: wrap;">
                     <a href="https://sno.mb222.de/faq-tm/" target="_blank" class="btn-secondary" style="text-decoration:none; display:inline-block; text-align:center;">
                         Ausführliche Dokumentation & FAQ
                     </a>
-                    <a href="https://github.com/SyncNetOps/int_SNO_teammessage/issues" target="_blank" class="btn-danger" style="text-decoration:none; display:inline-block; text-align:center;">
-                        Fehler / Issue melden (GitHub)
-                    </a>
                 </div>
             </div>
         `;
 
-        // Navigation & Menu
         this.querySelector('#burger-btn').addEventListener('click', () => this.fireEvent('hass-toggle-menu'));
         this.querySelectorAll('.nav button').forEach(btn => btn.addEventListener('click', (e) => this.switchTab(e.target.dataset.tab)));
         
-        // Logbuch Actions
         this.querySelector('#log-filter').addEventListener('input', (e) => this.renderLogs(e.target.value));
-        this.querySelector('#btn-log-refresh').addEventListener('click', () => {
-            this.showToast("Aktualisiere Logbuch...", "info");
-            this.fetchLogs();
-        });
+        this.querySelector('#btn-log-refresh').addEventListener('click', () => { this.showToast("Aktualisiere Logbuch...", "info"); this.fetchLogs(); });
         
-        // Logbuch Settings Modal
         this.querySelector('#btn-log-settings').addEventListener('click', () => {
             this.querySelector('#log-opt-auto').checked = this.logSettings.autoRefresh;
             this.querySelector('#log-opt-interval').value = this.logSettings.interval;
             this.querySelector('#log-opt-limit').value = this.logSettings.limit;
             this.querySelector('#log-settings-modal').classList.add('active');
         });
-        this.querySelector('#btn-log-modal-cancel').addEventListener('click', () => {
-            this.querySelector('#log-settings-modal').classList.remove('active');
-        });
+        this.querySelector('#btn-log-modal-cancel').addEventListener('click', () => { this.querySelector('#log-settings-modal').classList.remove('active'); });
         this.querySelector('#btn-log-modal-save').addEventListener('click', () => {
             this.logSettings.autoRefresh = this.querySelector('#log-opt-auto').checked;
             this.logSettings.interval = parseInt(this.querySelector('#log-opt-interval').value) || 30000;
@@ -411,12 +375,9 @@ class TeamMessagePanel extends HTMLElement {
             
             this.querySelector('#log-settings-modal').classList.remove('active');
             this.showToast("Log-Einstellungen übernommen.", "success");
-            
-            this.applyLogTimer();
-            this.fetchLogs();
+            this.applyLogTimer(); this.fetchLogs();
         });
 
-        // Other Tabs Actions
         this.querySelector('#btn-send').addEventListener('click', () => this.sendMessage());
         this.querySelector('#btn-load-contacts').addEventListener('click', () => this.loadContacts());
         this.querySelector('#btn-new-contact').addEventListener('click', () => this.openContactModal(null));
@@ -426,31 +387,28 @@ class TeamMessagePanel extends HTMLElement {
 
         this.querySelector('#send-type').addEventListener('change', (e) => {
             const wrap = this.querySelector('#target-wrapper');
+            const authFields = this.querySelector('#list-auth-fields');
+            
             if (e.target.value === 'direct') {
                 wrap.innerHTML = `<input type="text" id="send-target-direct" placeholder="+491701234567">`;
+                authFields.style.display = 'none';
             } else {
                 wrap.innerHTML = `<select id="send-target-list"></select>`;
+                authFields.style.display = 'block';
                 this.populateDropdowns();
             }
         });
     }
 
     applyLogTimer() {
-        if (this.logTimer) {
-            clearInterval(this.logTimer);
-            this.logTimer = null;
-        }
+        if (this.logTimer) { clearInterval(this.logTimer); this.logTimer = null; }
         if (this.logSettings.autoRefresh) {
             this.logTimer = setInterval(() => {
-                // Führe den Refresh nur durch, wenn der User den Log-Tab geöffnet hat
-                if (this.currentTab === 'logs') {
-                    this.fetchLogs(true);
-                }
+                if (this.currentTab === 'logs') this.fetchLogs(true);
             }, this.logSettings.interval);
         }
     }
 
-    // --- Helferfunktionen für das Logbuch-Design ---
     maskPhone(num) {
         if (!num) return "Unbekannt";
         const s = String(num).trim();
@@ -523,7 +481,6 @@ class TeamMessagePanel extends HTMLElement {
             let errMsg = "API Kommunikationsfehler";
             if (e.body && e.body.message) errMsg = e.body.message;
             else if (e.message) errMsg = e.message;
-            
             this.showToast(errMsg, "error");
             return null;
         }
@@ -565,7 +522,6 @@ class TeamMessagePanel extends HTMLElement {
     }
 
     async fetchLogs(silent = false) {
-        // Nutzt die konfigurierte Quantity aus dem Settings-Modal
         const data = await this.apiCall('GET', '/logging/sms/', null, { quantity: this.logSettings.limit });
         if(data && data.rows) {
             this.logData = data.rows;
@@ -644,7 +600,6 @@ class TeamMessagePanel extends HTMLElement {
         });
         container.innerHTML = html;
 
-        // Klick-Ereignisse für das Akkordeon
         container.querySelectorAll('.log-summary').forEach(el => {
             el.addEventListener('click', (e) => {
                 const details = e.currentTarget.nextElementSibling;
@@ -665,25 +620,32 @@ class TeamMessagePanel extends HTMLElement {
         });
     }
 
-    // Nativer Aufruf des HA Services für 100% Backend-Fehlertoleranz!
     async sendMessage() {
         const type = this.querySelector('#send-type').value;
         const targetEl = type === 'direct' ? this.querySelector('#send-target-direct') : this.querySelector('#send-target-list');
         const target = targetEl ? targetEl.value : null;
         const msg = this.querySelector('#send-msg').value;
-        const channel = this.querySelector('#send-channel').value; 
+        const channelInput = this.querySelector('#send-channel').value; 
         
         if(!target || !msg) return this.showToast("Bitte Ziel und Nachricht ausfüllen", "error");
         
         const payload = { 
-            message: msg,
-            channel: channel 
+            message: msg 
         };
         
         if(type === 'direct') {
+            payload.target_type = 'direct';
             payload.to_mobile = target;
+            payload.channel = channelInput;
         } else {
+            payload.target_type = 'list';
             payload.teamlist_email = target; 
+            payload.channel = 'list';
+            
+            const kw = this.querySelector('#send-keyword').value;
+            const sender = this.querySelector('#send-sender').value;
+            if(kw) payload.keyword = kw;
+            if(sender) payload.sender_email = sender;
         }
 
         const btn = this.querySelector('#btn-send');
@@ -805,12 +767,18 @@ class TeamMessagePanel extends HTMLElement {
         const id = this.querySelector('#modal-mb-id').value;
         
         const payload = {
+            data: {
+                mb: id || "",
+                name: this.querySelector('#modal-name').value,
+                contact: this.querySelector('#modal-contact').value,
+                channel: this.querySelector('#modal-type').value
+            },
             mb_name: this.querySelector('#modal-name').value,
             mb_contact: this.querySelector('#modal-contact').value,
             mb_contacttype: this.querySelector('#modal-type').value
         };
 
-        if(!payload.mb_name || !payload.mb_contact) return this.showToast("Bitte Name und Kontakt angeben", "error");
+        if(!payload.data.name || !payload.data.contact) return this.showToast("Bitte Name und Kontakt angeben", "error");
 
         this.showToast("Speichere...", "info");
         let res;

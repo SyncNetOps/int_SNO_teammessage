@@ -1,9 +1,19 @@
-
-# custom_components/sno_teammessage/services.yaml
 send_message:
-  name: "Nachricht senden (Multi-Kanal)"
-  description: "Sendet eine Nachricht über TeamMessage an eine direkte Nummer oder eine Teamliste."
+  name: "Nachricht senden (TeamMessage)"
+  description: "Sendet eine Nachricht direkt an eine Nummer oder an eine Teamliste/Gruppe."
   fields:
+    target_type:
+      name: "Versandart"
+      description: "Möchtest du eine Direktnachricht oder an eine Gruppe senden?"
+      required: true
+      default: "direct"
+      selector:
+        select:
+          options:
+            - label: "Direkt an Handynummer"
+              value: "direct"
+            - label: "An Gruppe / Teamliste"
+              value: "list"
     message:
       name: "Nachricht"
       description: "Der Text der Nachricht (max. 1600 Zeichen)."
@@ -13,29 +23,40 @@ send_message:
         text:
           multiline: true
     to_mobile:
-      name: "Zielrufnummer (Direkt)"
-      description: "Einzelne Handynummer für direkten SMS-Versand (z.B. +491701234567)."
+      name: "Zielrufnummer (nur Direktversand)"
+      description: "Einzelne Handynummer für direkten Versand (z.B. +491701234567)."
       required: false
       selector:
         text:
     teamlist_email:
-      name: "Teamliste (Zwingend erforderlich)"
-      description: "Die Adresse (z.B. meinteam@tmsg.de) oder die ID der Teamliste. Wird für Abrechnung und Routing zwingend benötigt, auch bei Direktnachrichten."
+      name: "Teamliste / Gruppe (nur Gruppenversand)"
+      description: "Die ID oder E-Mail Adresse der Teamliste."
       example: "meinteam@tmsg.de"
-      required: true
-      selector:
-        text:
-    sender_email:
-      name: "Absender E-Mail (Geschlossene Gruppe)"
-      description: "NUR die reine E-Mail Adresse (z.B. user@gmail.com). Keine Keywords hier eintragen!"
-      example: "user@gmail.com"
       required: false
       selector:
         text:
+    channel:
+      name: "Bevorzugter Kanal (nur Direktversand)"
+      description: "Wähle SMS oder Voice. (Wird bei Gruppen ignoriert)"
+      default: "sms"
+      selector:
+        select:
+          options:
+            - label: "SMS Textnachricht"
+              value: "sms"
+            - label: "Sprachanruf (Voice)"
+              value: "voice"
     keyword:
-      name: "Keyword / Passwort"
-      description: "Das Keyword für geschlossene Gruppen (z.B. SMSAlarm). Die Integration fügt es automatisch korrekt formatiert vor deine Nachricht ein."
+      name: "Keyword / Passwort (nur Gruppenversand)"
+      description: "Das Keyword für geschlossene Gruppen."
       example: "SMSAlarm"
+      required: false
+      selector:
+        text:
+    sender_email:
+      name: "Absender E-Mail (nur Gruppenversand)"
+      description: "NUR die reine E-Mail Adresse eines Mitglieds (Authentifizierung)."
+      example: "user@gmail.com"
       required: false
       selector:
         text:
@@ -75,4 +96,3 @@ send_message:
       default: false
       selector:
         boolean:
-

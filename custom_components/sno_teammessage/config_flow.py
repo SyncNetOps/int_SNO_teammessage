@@ -1,4 +1,4 @@
-# custom_components/sno_teammessage/config_flow.py | v1.1.0
+# custom_components/sno_teammessage/config_flow.py || V1.1.1
 """Config flow and Options flow for SNO - TeamMessage integration."""
 import logging
 from typing import Any, Dict

@@ -1,4 +1,4 @@
-# custom_components/sno_teammessage/webhook.py | v1.1.0
+# custom_components/sno_teammessage/webhook.py || V1.1.1
 """Webhook handler for receiving inbound messages from TeamMessage."""
 import logging
 from aiohttp.web import Request, Response
