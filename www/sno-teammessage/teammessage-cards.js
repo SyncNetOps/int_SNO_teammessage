@@ -1,12 +1,18 @@
 // ==============================================================================
-// SNO TeamMessage - Custom Dashboard Cards (V20 - Ultimate Dropdown Fix)
+// SNO TeamMessage - Custom Dashboard Cards (V2.0 - Hybrid Settings System)
 // ==============================================================================
 
 console.info(
-    `%c SNO-TEAMMESSAGE CARDS %c Version 20.0 - Lade Premium UI... `,
+    `%c SNO-TEAMMESSAGE CARDS %c Version 2.0 - Lade Premium UI... `,
     'color: white; background: #03a9f4; font-weight: bold; padding: 4px; border-radius: 4px 0 0 4px;',
     'color: white; background: #333; font-weight: bold; padding: 4px; border-radius: 0 4px 4px 0;'
 );
+
+// --- State Persistenz Helfer (Neu in V2.0) ---
+function getCardKey(config) {
+    const safeTitle = (config.title || 'default').replace(/[^a-zA-Z0-9]/g, '_');
+    return `sno_tm_v2_${config.type}_${safeTitle}`;
+}
 
 // --- Flexibler API Fetcher ---
 async function fetchTMApi(hass, endpoint, config) {
@@ -95,7 +101,7 @@ class SNOTeamMessageSendCardEditor extends HTMLElement {
                 <input type="text" id="teamlists" value="${this._config.teamlists || ''}" class="tm-input" placeholder="z.B. alarme@tmsg.de, it@tmsg.de">
                 <p style="font-size:0.8rem; color:var(--secondary-text-color); margin-top:-10px; margin-bottom:15px;">Diese Listen können komfortabel im Dropdown ausgewählt werden.</p>
 
-                <h3 style="margin-top:20px; border-bottom: 1px solid var(--divider-color); padding-bottom:5px;">Visuelles Setup</h3>
+                <h3 style="margin-top:20px; border-bottom: 1px solid var(--divider-color); padding-bottom:5px;">Visuelles Setup (Globaler Standard)</h3>
                 <label style="display:block; margin-bottom:5px; font-weight:bold;">Design-Modus</label>
                 <select id="theme" class="tm-input">
                     <option value="classic" ${this._config.theme === 'classic' ? 'selected' : ''}>Klassisch (HA Default)</option>
@@ -148,7 +154,7 @@ class SNOTeamMessageDataCardEditor extends HTMLElement {
                 <label style="display:block; margin-bottom:5px; font-weight:bold; color:var(--primary-color);">Kd.Nr. (Team-ID) - PFLICHTFELD</label>
                 <input type="number" id="tm" value="${this._config.tm || ''}" class="tm-input" placeholder="z.B. 100042">
                 
-                <h3 style="margin-top:20px; border-bottom: 1px solid var(--divider-color); padding-bottom:5px;">Visuelles Setup & Logik</h3>
+                <h3 style="margin-top:20px; border-bottom: 1px solid var(--divider-color); padding-bottom:5px;">Visuelles Setup & Logik (Globaler Standard)</h3>
                 
                 <label style="display:block; margin-bottom:5px; font-weight:bold;">Design-Modus</label>
                 <select id="theme" class="tm-input">
@@ -220,7 +226,7 @@ class SNOTeamMessageDataCardEditor extends HTMLElement {
 customElements.define("sno-teammessage-data-editor", SNOTeamMessageDataCardEditor);
 
 
-// --- Styling System (5 Themes + Animations) ---
+// --- Styling System ---
 const getStyles = () => `
     <style>
         ha-card { padding: 16px; border-radius: var(--ha-card-border-radius, 12px); box-shadow: var(--ha-card-box-shadow, 0px 2px 1px -1px rgba(0,0,0,0.2)); background: var(--card-background-color, #fff); color: var(--primary-text-color, #000); position: relative; overflow: hidden; transition: all 0.3s ease; }
@@ -245,7 +251,7 @@ const getStyles = () => `
         ha-card.theme-neon input, ha-card.theme-neon select, ha-card.theme-neon textarea { background: #121214 !important; border: 1px solid var(--primary-color) !important; color: #fff !important; box-shadow: inset 0 0 5px rgba(var(--rgb-primary-color), 0.3); }
         ha-card.theme-neon .log-entry { border-bottom-color: rgba(var(--rgb-primary-color), 0.3); }
         ha-card.theme-neon .log-details, ha-card.theme-neon .credit-stats { background: #121214; border-left: 2px solid var(--primary-color); }
-        ha-card.theme-neon button { box-shadow: 0 0 10px rgba(var(--rgb-primary-color), 0.5); }
+        ha-card.theme-neon button:not(.btn-secondary) { box-shadow: 0 0 10px rgba(var(--rgb-primary-color), 0.5); }
 
         .animate-on-load { animation: cardFadeScaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes cardFadeScaleIn { 0% { opacity: 0; transform: translateY(15px) scale(0.97); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
@@ -266,6 +272,10 @@ const getStyles = () => `
         button:hover { filter: brightness(1.1); }
         button:active { transform: scale(0.98); }
         button:disabled { opacity: 0.5; cursor:not-allowed; }
+        
+        /* Secondary Button (Reset) */
+        button.btn-secondary { background: transparent; color: var(--secondary-text-color); border: 1px solid var(--divider-color); margin-top: 10px; font-weight: normal;}
+        button.btn-secondary:hover { background: var(--secondary-background-color); color: var(--primary-text-color); }
         
         .msg { margin-top: 10px; font-weight: bold; padding: 8px; border-radius: 4px; }
         .err { color: #f44336; background: rgba(244, 67, 54, 0.1); border-left: 4px solid #f44336; }
@@ -321,7 +331,7 @@ function getSettingsModalHTML(type, state) {
         <div class="modal-overlay tm-settings-modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <span>Schnelleinstellungen</span>
+                    <span>Persönliche Einstellungen</span>
                     <ha-icon icon="mdi:close" class="modal-close"></ha-icon>
                 </div>
                 
@@ -372,7 +382,8 @@ function getSettingsModalHTML(type, state) {
                 </div>
                 ` : ''}
 
-                <button class="btn-save-settings" style="margin-top:15px;">Anwenden</button>
+                <button class="btn-save-settings" style="margin-top:15px;">Persönlich anwenden</button>
+                <button class="btn-secondary btn-reset-settings">Auf globalen Standard zurücksetzen</button>
             </div>
         </div>
     `;
@@ -380,7 +391,7 @@ function getSettingsModalHTML(type, state) {
 
 
 // ==========================================
-// 1. SENDEN KARTE (Mit Live-Dropdown Settings)
+// 1. SENDEN KARTE
 // ==========================================
 class SNOTeamMessageSendCard extends HTMLElement {
     static getConfigElement() { return document.createElement("sno-teammessage-send-editor"); }
@@ -388,11 +399,16 @@ class SNOTeamMessageSendCard extends HTMLElement {
     
     setConfig(config) { 
         this.config = config; 
-        // Lade Konfiguration oder Fallback in den lokalen State
+        this.cardKey = getCardKey(this.config);
+        
+        // State Merging: 1. LocalStorage (Nutzer) > 2. Config (Global Admin) > 3. Fallback
+        let local = {};
+        try { local = JSON.parse(localStorage.getItem(this.cardKey)) || {}; } catch(e){}
+
         this.state = {
-            theme: this.config.theme || 'classic',
-            animation: this.config.animation !== false,
-            teamlists: this.config.teamlists || ''
+            theme: local.theme ?? this.config.theme ?? 'classic',
+            animation: local.animation ?? this.config.animation !== false,
+            teamlists: local.teamlists ?? this.config.teamlists ?? ''
         };
     }
     
@@ -408,7 +424,7 @@ class SNOTeamMessageSendCard extends HTMLElement {
                     <div class="header">
                         <div class="header-left"><ha-icon icon="mdi:message-fast"></ha-icon> <span>${this.config.title || 'Nachricht Senden'}</span></div>
                         <div class="header-actions">
-                            <div class="header-btn btn-settings" title="Einstellungen"><ha-icon icon="mdi:cog"></ha-icon></div>
+                            <div class="header-btn btn-settings" title="Persönliche Einstellungen"><ha-icon icon="mdi:cog"></ha-icon></div>
                         </div>
                     </div>
                     <div class="input-group">
@@ -431,14 +447,13 @@ class SNOTeamMessageSendCard extends HTMLElement {
                 </ha-card>
             `;
             this.setupInteractions();
-            this.updateDropdownVisibility(); // Initiales Setup des Dropdowns
+            this.updateDropdownVisibility(); 
         } else {
             this.applyThemeUpdates();
-            this.updateDropdownVisibility(); // Aktualisierung bei Config-Änderung von außen
+            this.updateDropdownVisibility(); 
         }
     }
 
-    // --- Die sichere Logik für das Dropdown ---
     updateDropdownVisibility() {
         const typeSelect = this.querySelector('#tm-type');
         const targetInput = this.querySelector('#tm-target-input');
@@ -446,8 +461,7 @@ class SNOTeamMessageSendCard extends HTMLElement {
         
         if (!targetInput || !targetSelect || !typeSelect) return;
 
-        // Nutzt primär den lokalen State (der durch das Zahnrad aktualisiert wird)
-        const teamlistsStr = this.state.teamlists || this.config.teamlists || "";
+        const teamlistsStr = this.state.teamlists || "";
         const lists = teamlistsStr.split(',').map(s => s.trim()).filter(s => s.length > 0);
         const hasTeamlists = lists.length > 0;
 
@@ -457,7 +471,6 @@ class SNOTeamMessageSendCard extends HTMLElement {
             targetInput.placeholder = "Empfänger (+49...)";
         } else {
             if (hasTeamlists) {
-                // Wert merken, Liste füllen, Wert wieder setzen (falls noch vorhanden)
                 const currentVal = targetSelect.value;
                 targetSelect.innerHTML = lists.map(l => `<option value="${l}">${l}</option>`).join('');
                 if (lists.includes(currentVal)) targetSelect.value = currentVal;
@@ -465,7 +478,6 @@ class SNOTeamMessageSendCard extends HTMLElement {
                 targetInput.style.display = 'none';
                 targetSelect.style.display = 'block';
             } else {
-                // Fallback, falls keine Listen definiert wurden
                 targetInput.style.display = 'block';
                 targetSelect.style.display = 'none';
                 targetInput.placeholder = "Teamliste (z.B. liste@tmsg.de)";
@@ -477,9 +489,7 @@ class SNOTeamMessageSendCard extends HTMLElement {
         const titleSpan = this.querySelector('.header span');
         if(titleSpan) titleSpan.innerText = this.config.title || 'Nachricht Senden';
         const card = this.querySelector('ha-card');
-        if(card) {
-            card.className = `theme-${this.state.theme} ${this.state.animation ? 'animate-on-load' : ''}`;
-        }
+        if(card) card.className = `theme-${this.state.theme} ${this.state.animation ? 'animate-on-load' : ''}`;
     }
 
     setupInteractions() {
@@ -492,18 +502,37 @@ class SNOTeamMessageSendCard extends HTMLElement {
         // Modal Logic (Zahnrad)
         this.querySelector('.btn-settings').addEventListener('click', () => modal.style.display = 'flex');
         this.querySelector('.modal-close').addEventListener('click', () => modal.style.display = 'none');
+        
+        // Einstellungen Anwenden & Speichern (LocalStorage)
         this.querySelector('.btn-save-settings').addEventListener('click', () => {
             this.state.theme = this.querySelector('.set-theme').value;
             this.state.animation = this.querySelector('.set-anim').checked;
-            
-            // Lese die neue Teamliste aus dem Modal
             const teamlistsInput = this.querySelector('.set-teamlists');
-            if (teamlistsInput) {
-                this.state.teamlists = teamlistsInput.value;
-            }
+            if (teamlistsInput) this.state.teamlists = teamlistsInput.value;
+            
+            localStorage.setItem(this.cardKey, JSON.stringify(this.state));
             
             this.applyThemeUpdates();
-            this.updateDropdownVisibility(); // Dropdown SOFORT aktualisieren!
+            this.updateDropdownVisibility(); 
+            modal.style.display = 'none';
+        });
+
+        // Auf Globalen Standard zurücksetzen
+        this.querySelector('.btn-reset-settings').addEventListener('click', () => {
+            localStorage.removeItem(this.cardKey);
+            this.state = {
+                theme: this.config.theme || 'classic',
+                animation: this.config.animation !== false,
+                teamlists: this.config.teamlists || ''
+            };
+            
+            this.querySelector('.set-theme').value = this.state.theme;
+            this.querySelector('.set-anim').checked = this.state.animation;
+            const setTeamlists = this.querySelector('.set-teamlists');
+            if (setTeamlists) setTeamlists.value = this.state.teamlists;
+
+            this.applyThemeUpdates();
+            this.updateDropdownVisibility();
             modal.style.display = 'none';
         });
 
@@ -541,7 +570,6 @@ class SNOTeamMessageSendCard extends HTMLElement {
         status.style.display = 'block';
         let finalTarget = "";
         
-        // --- Exakte Validierung je nach sichtbarem Feld ---
         if (type === 'direct') {
             finalTarget = autoFormatPhone(targetInput.value.trim());
             targetInput.value = finalTarget; 
@@ -549,13 +577,11 @@ class SNOTeamMessageSendCard extends HTMLElement {
                 status.className = "msg err"; status.innerText = "Ungültige Telefonnummer (z.B. +49171...)."; return;
             }
         } else {
-            // Auslesen des Feldes, das dem Nutzer gerade angezeigt wird
             if (targetSelect.style.display === 'block' && targetSelect.options.length > 0) {
                 finalTarget = targetSelect.value.trim();
             } else {
                 finalTarget = targetInput.value.trim();
             }
-            
             if (!finalTarget.includes('@')) {
                 status.className = "msg err"; status.innerText = "Ungültige E-Mail-Adresse für Teamliste."; return;
             }
@@ -590,11 +616,16 @@ class SNOTeamMessageCreditCard extends HTMLElement {
     
     setConfig(config) { 
         this.config = config; 
+        this.cardKey = getCardKey(this.config);
+        
+        let local = {};
+        try { local = JSON.parse(localStorage.getItem(this.cardKey)) || {}; } catch(e){}
+
         this.state = {
-            theme: this.config.theme || 'classic',
-            animation: this.config.animation !== false,
-            interval: this.config.interval || 30000,
-            autoRefresh: true
+            theme: local.theme ?? this.config.theme ?? 'classic',
+            animation: local.animation ?? this.config.animation !== false,
+            interval: local.interval ?? this.config.interval ?? 30000,
+            autoRefresh: local.autoRefresh ?? true
         };
         this.lastFetch = 0;
         this.timer = null;
@@ -613,7 +644,7 @@ class SNOTeamMessageCreditCard extends HTMLElement {
                         <div class="header-left"><ha-icon icon="mdi:wallet"></ha-icon> <span>${this.config.title || 'Guthaben & Statistik'}</span></div>
                         <div class="header-actions">
                             <div class="header-btn" id="btn-refresh" title="Aktualisieren"><ha-icon icon="mdi:refresh"></ha-icon></div>
-                            <div class="header-btn btn-settings" title="Einstellungen"><ha-icon icon="mdi:cog"></ha-icon></div>
+                            <div class="header-btn btn-settings" title="Persönliche Einstellungen"><ha-icon icon="mdi:cog"></ha-icon></div>
                         </div>
                     </div>
                     <div id="tm-content" class="msg warn">Lade Daten...</div>
@@ -644,11 +675,36 @@ class SNOTeamMessageCreditCard extends HTMLElement {
         const modal = this.querySelector('.tm-settings-modal');
         this.querySelector('.btn-settings').addEventListener('click', () => modal.style.display = 'flex');
         this.querySelector('.modal-close').addEventListener('click', () => modal.style.display = 'none');
+        
+        // Speichern
         this.querySelector('.btn-save-settings').addEventListener('click', () => {
             this.state.theme = this.querySelector('.set-theme').value;
             this.state.animation = this.querySelector('.set-anim').checked;
             this.state.autoRefresh = this.querySelector('.set-auto').checked;
             this.state.interval = parseInt(this.querySelector('.set-interval').value);
+            
+            localStorage.setItem(this.cardKey, JSON.stringify(this.state));
+
+            this.applyThemeUpdates();
+            this.setupTimer();
+            modal.style.display = 'none';
+        });
+
+        // Zurücksetzen
+        this.querySelector('.btn-reset-settings').addEventListener('click', () => {
+            localStorage.removeItem(this.cardKey);
+            this.state = {
+                theme: this.config.theme || 'classic',
+                animation: this.config.animation !== false,
+                interval: this.config.interval || 30000,
+                autoRefresh: true
+            };
+            
+            this.querySelector('.set-theme').value = this.state.theme;
+            this.querySelector('.set-anim').checked = this.state.animation;
+            this.querySelector('.set-auto').checked = this.state.autoRefresh;
+            this.querySelector('.set-interval').value = this.state.interval;
+
             this.applyThemeUpdates();
             this.setupTimer();
             modal.style.display = 'none';
@@ -693,11 +749,16 @@ class SNOTeamMessageStatsCard extends HTMLElement {
     
     setConfig(config) { 
         this.config = config; 
+        this.cardKey = getCardKey(this.config);
+
+        let local = {};
+        try { local = JSON.parse(localStorage.getItem(this.cardKey)) || {}; } catch(e){}
+
         this.state = {
-            theme: this.config.theme || 'classic',
-            animation: this.config.animation !== false,
-            interval: this.config.interval || 30000,
-            autoRefresh: true
+            theme: local.theme ?? this.config.theme ?? 'classic',
+            animation: local.animation ?? this.config.animation !== false,
+            interval: local.interval ?? this.config.interval ?? 30000,
+            autoRefresh: local.autoRefresh ?? true
         };
         this.lastFetch = 0; this.timer = null;
     }
@@ -715,7 +776,7 @@ class SNOTeamMessageStatsCard extends HTMLElement {
                         <div class="header-left"><ha-icon icon="mdi:chart-bar"></ha-icon> <span>${this.config.title || 'Verbrauch'}</span></div>
                         <div class="header-actions">
                             <div class="header-btn" id="btn-refresh" title="Aktualisieren"><ha-icon icon="mdi:refresh"></ha-icon></div>
-                            <div class="header-btn btn-settings" title="Einstellungen"><ha-icon icon="mdi:cog"></ha-icon></div>
+                            <div class="header-btn btn-settings" title="Persönliche Einstellungen"><ha-icon icon="mdi:cog"></ha-icon></div>
                         </div>
                     </div>
                     <div id="tm-content" class="msg warn">Lade Daten...</div>
@@ -744,11 +805,36 @@ class SNOTeamMessageStatsCard extends HTMLElement {
         const modal = this.querySelector('.tm-settings-modal');
         this.querySelector('.btn-settings').addEventListener('click', () => modal.style.display = 'flex');
         this.querySelector('.modal-close').addEventListener('click', () => modal.style.display = 'none');
+        
+        // Speichern
         this.querySelector('.btn-save-settings').addEventListener('click', () => {
             this.state.theme = this.querySelector('.set-theme').value;
             this.state.animation = this.querySelector('.set-anim').checked;
             this.state.autoRefresh = this.querySelector('.set-auto').checked;
             this.state.interval = parseInt(this.querySelector('.set-interval').value);
+            
+            localStorage.setItem(this.cardKey, JSON.stringify(this.state));
+
+            this.applyThemeUpdates();
+            this.setupTimer();
+            modal.style.display = 'none';
+        });
+
+        // Zurücksetzen
+        this.querySelector('.btn-reset-settings').addEventListener('click', () => {
+            localStorage.removeItem(this.cardKey);
+            this.state = {
+                theme: this.config.theme || 'classic',
+                animation: this.config.animation !== false,
+                interval: this.config.interval || 30000,
+                autoRefresh: true
+            };
+            
+            this.querySelector('.set-theme').value = this.state.theme;
+            this.querySelector('.set-anim').checked = this.state.animation;
+            this.querySelector('.set-auto').checked = this.state.autoRefresh;
+            this.querySelector('.set-interval').value = this.state.interval;
+
             this.applyThemeUpdates();
             this.setupTimer();
             modal.style.display = 'none';
@@ -786,12 +872,17 @@ class SNOTeamMessageLogCard extends HTMLElement {
     
     setConfig(config) { 
         this.config = config; 
+        this.cardKey = getCardKey(this.config);
+
+        let local = {};
+        try { local = JSON.parse(localStorage.getItem(this.cardKey)) || {}; } catch(e){}
+
         this.state = {
-            theme: this.config.theme || 'classic',
-            animation: this.config.animation !== false,
-            interval: this.config.interval || 30000,
-            autoRefresh: true,
-            limit: this.config.quantity || 5
+            theme: local.theme ?? this.config.theme ?? 'classic',
+            animation: local.animation ?? this.config.animation !== false,
+            interval: local.interval ?? this.config.interval ?? 30000,
+            autoRefresh: local.autoRefresh ?? true,
+            limit: local.limit ?? this.config.quantity ?? 5
         };
         this.lastFetch = 0; this.timer = null;
     }
@@ -809,7 +900,7 @@ class SNOTeamMessageLogCard extends HTMLElement {
                         <div class="header-left"><ha-icon icon="mdi:format-list-bulleted"></ha-icon> <span>${this.config.title || 'Protokoll'}</span></div>
                         <div class="header-actions">
                             <div class="header-btn" id="btn-refresh" title="Aktualisieren"><ha-icon icon="mdi:refresh"></ha-icon></div>
-                            <div class="header-btn btn-settings" title="Einstellungen"><ha-icon icon="mdi:cog"></ha-icon></div>
+                            <div class="header-btn btn-settings" title="Persönliche Einstellungen"><ha-icon icon="mdi:cog"></ha-icon></div>
                         </div>
                     </div>
                     <div id="tm-content" class="msg warn">Lade Daten...</div>
@@ -838,12 +929,40 @@ class SNOTeamMessageLogCard extends HTMLElement {
         const modal = this.querySelector('.tm-settings-modal');
         this.querySelector('.btn-settings').addEventListener('click', () => modal.style.display = 'flex');
         this.querySelector('.modal-close').addEventListener('click', () => modal.style.display = 'none');
+        
+        // Speichern
         this.querySelector('.btn-save-settings').addEventListener('click', () => {
             this.state.theme = this.querySelector('.set-theme').value;
             this.state.animation = this.querySelector('.set-anim').checked;
             this.state.autoRefresh = this.querySelector('.set-auto').checked;
             this.state.interval = parseInt(this.querySelector('.set-interval').value);
             this.state.limit = parseInt(this.querySelector('.set-limit').value) || 5;
+            
+            localStorage.setItem(this.cardKey, JSON.stringify(this.state));
+
+            this.applyThemeUpdates();
+            this.setupTimer();
+            modal.style.display = 'none';
+            this.fetchData(true);
+        });
+
+        // Zurücksetzen
+        this.querySelector('.btn-reset-settings').addEventListener('click', () => {
+            localStorage.removeItem(this.cardKey);
+            this.state = {
+                theme: this.config.theme || 'classic',
+                animation: this.config.animation !== false,
+                interval: this.config.interval || 30000,
+                autoRefresh: true,
+                limit: this.config.quantity || 5
+            };
+            
+            this.querySelector('.set-theme').value = this.state.theme;
+            this.querySelector('.set-anim').checked = this.state.animation;
+            this.querySelector('.set-auto').checked = this.state.autoRefresh;
+            this.querySelector('.set-interval').value = this.state.interval;
+            this.querySelector('.set-limit').value = this.state.limit;
+
             this.applyThemeUpdates();
             this.setupTimer();
             modal.style.display = 'none';
