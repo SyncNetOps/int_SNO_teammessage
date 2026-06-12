@@ -149,7 +149,7 @@ Die Integration erstellt automatisch nützliche Entitäten, die zyklisch (alle 5
 ## 📚 Umfassende Dokumentation (Release v1.1.1)
 
 Für tiefergehende Informationen zu Updates, technischen Hintergründen, API-Spezifikationen und detaillierten Nutzungsszenarien stehen im Repository umfangreiche Dokumentationen zur Verfügung:
-
+### Integration & Panel
 * 📖 **[Ausführliche Anwenderanleitung](https://github.com/SyncNetOps/int_SNO_teammessage/blob/main/Docs%2FV1.1.1%2FAnwenderanleitung.md)**  
   Ein kompletter Schritt-für-Schritt-Guide für Installation, Einrichtung, das Panel, Dashboard-Karten und fortgeschrittene Automatisierungen.
 * 💻 **[Entwickler- & Architektur-Dokumentation](https://github.com/SyncNetOps/int_SNO_teammessage/blob/main/Docs%2FV1.1.1%2FEntwicklerdoku-V1-1-1.md)**  
@@ -160,7 +160,11 @@ Für tiefergehende Informationen zu Updates, technischen Hintergründen, API-Spe
   Detaillierte Analyse und Beschreibung der gelösten Pydantic-Payload- und API-Routing-Fehler.
 * 🌍 **[Entwickler Website & FAQ](http://sno.mb222.de/faq-tm/)**  
   Offizielle Wissensdatenbank, häufig gestellte Fragen und weiterführender Support direkt vom Entwickler.
-
+### Dashboard-Karten
+* 📖 **[Dashboard-Karten Anwenderanleitung]([https://github.com/SyncNetOps/int_SNO_teammessage/blob/main/Docs%2FV1.1.1%2FAnwenderanleitung.md](https://github.com/SyncNetOps/int_SNO_teammessage/blob/main/Docs/DashboardCards/Anwender-Doku.md))**  
+  Ein kompletter Schritt-für-Schritt-Guide für Installation & Einrichtung der Dashboard-Karten.
+  * 💻 **[Dashboard-Karten Entwicklerdokumentation]([https://github.com/SyncNetOps/int_SNO_teammessage/blob/main/Docs%2FV1.1.1%2FEntwicklerdoku-V1-1-1.md](https://github.com/SyncNetOps/int_SNO_teammessage/blob/main/Docs/DashboardCards/Entwickler-Doku.md))**  
+  Für Dashboard-Karten Entwickler.
 ---
 
 ## 🐛 Fehlerbehebung / Support
