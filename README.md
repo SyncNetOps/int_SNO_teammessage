@@ -11,7 +11,6 @@ Eine vollumfängliche, smarte und fehlertolerante Home Assistant Integration fü
 Sende zuverlässige **SMS-Textnachrichten**, **Sprachanrufe (Voice)** und Push-Benachrichtigungen hochzuverlässig direkt aus deinen Home Assistant Automatisierungen an Einzelpersonen oder ganze Teamlisten. Die Integration nutzt die moderne REST-API (v1.1.0) des Anbieters mit Bearer-Token-Authentifizierung.
 
 **Entwickler:** [SyncNetOps](https://github.com/SyncNetOps)  
-**Offizielle FAQ & Dokumentation:** [SNO TeamMessage Doku](https://sno.mb222.de/faq-tm/)
 
 ---
 
@@ -96,6 +95,7 @@ Wähle eine Karte aus. Im visuellen Editor kannst du nun den Titel anpassen und 
 Nachrichten werden über den Dienst `sno_teammessage.send_message` verschickt. Der Dienst unterscheidet sauber zwischen Direktversand (`target_type: direct`) und Gruppenversand (`target_type: list`).
 
 
+
 ### Beispiel: Direktnachricht (SMS) bei Alarm
 Sendet eine direkte SMS an eine spezifische Handynummer.
 
@@ -106,3 +106,73 @@ data:
   to_mobile: "+491701234567"
   message: "🚨 ALARM: Der Wassersensor im Waschkeller hat ausgelöst!"
   channel: sms
+```
+
+### Beispiel: Sprachanruf (Voice)
+Ein Sprachanruf ist besonders nachts hilfreich, da er Personen verlässlicher weckt als ein SMS-Ton.
+
+```yaml
+action: sno_teammessage.send_message
+data:
+  target_type: direct
+  to_mobile: "+491609876543"
+  message: "Achtung! Kritische Systemwarnung. Die Haustür wurde geöffnet."
+  channel: voice
+```
+
+### Beispiel: Gruppenversand (Teamliste)
+Dieser Aufruf sendet die Nachricht parallel an alle hinterlegten SMS/Voice-Empfänger der Teamliste. Die Auflösung der Kontakte übernimmt die Integration für dich.
+
+```yaml
+action: sno_teammessage.send_message
+data:
+  target_type: list
+  teamlist_email: "108975"
+  message: "SERVER OFFLINE: Der Home Assistant Server reagiert nicht mehr."
+  # Nur bei geschlossenen Gruppen nötig:
+  keyword: "SicherheitsPW"
+  sender_email: "admin@deinedomain.de"
+```
+
+---
+
+## 📊 Sensoren
+
+Die Integration erstellt automatisch nützliche Entitäten, die zyklisch (alle 5 Minuten) aktualisiert werden:
+
+* `sensor.sno_teammessage_<team_id>_credit`: Aktuell verfügbares SMS/Voice Guthaben.
+* `sensor.sno_teammessage_<team_id>_used`: Summe der bisher gesendeten Nachrichten.
+* `sensor.sno_teammessage_<team_id>_tariff`: Aktueller Tarif-Status (z.B. EASY, PAUSCHAL).
+
+---
+
+## 📚 Umfassende Dokumentation (Release v1.1.1)
+
+Für tiefergehende Informationen zu Updates, technischen Hintergründen, API-Spezifikationen und detaillierten Nutzungsszenarien stehen im Repository umfangreiche Dokumentationen zur Verfügung:
+
+* 📖 **[Ausführliche Anwenderanleitung](https://github.com/SyncNetOps/int_SNO_teammessage/blob/main/Docs%2FV1.1.1%2FAnwenderanleitung.md)**  
+  Ein kompletter Schritt-für-Schritt-Guide für Installation, Einrichtung, das Panel, Dashboard-Karten und fortgeschrittene Automatisierungen.
+* 💻 **[Entwickler- & Architektur-Dokumentation](https://github.com/SyncNetOps/int_SNO_teammessage/blob/main/Docs%2FV1.1.1%2FEntwicklerdoku-V1-1-1.md)**  
+  Tiefe Einblicke in die Hub-Architektur, Endpunkte und Service-Calls – ideal für Entwickler von Custom Lovelace Cards.
+* 📄 **[Changelog (v1.1.1)](https://github.com/SyncNetOps/int_SNO_teammessage/blob/main/Docs%2FV1.1.1%2Fchangelog.md)**  
+  Übersicht aller neuen Features, Anpassungen und Bugfixes dieses Releases.
+* 🐛 **[Technischer Bugfix Report](https://github.com/SyncNetOps/int_SNO_teammessage/blob/main/Docs%2FV1.1.1%2FBugfixBeschreibung.md)**  
+  Detaillierte Analyse und Beschreibung der gelösten Pydantic-Payload- und API-Routing-Fehler.
+* 🌍 **[Entwickler Website & FAQ](http://sno.mb222.de/faq-tm/)**  
+  Offizielle Wissensdatenbank, häufig gestellte Fragen und weiterführender Support direkt vom Entwickler.
+
+---
+
+## 🐛 Fehlerbehebung / Support
+
+Sollten Probleme auftreten (z. B. `invalid_to_mobile` oder `closed_group_auth`), prüfe bitte Folgendes:
+* Kontrolliere das Logbuch-Tab direkt im TeamMessage-Panel deines Home Assistant.
+* Stelle sicher, dass die Rufnummern in den Teamlisten das internationale Format aufweisen (`+49...`).
+
+Für ausführliche Hilfestellungen besuche unsere **[Offizielle FAQ & Dokumentation](http://sno.mb222.de/faq-tm/)**.
+
+Wenn du einen Bug gefunden hast, erstelle gerne ein Issue:  
+👉 **[Issue auf GitHub melden](https://github.com/SyncNetOps/int_SNO_teammessage/issues)**
+
+---
+*Hinweis: Dies ist eine Drittanbieter-Integration zur Nutzung eines API-Dienstes. Für den reellen Versand von SMS und Sprachanrufen fallen entsprechende Nutzungsgebühren beim Dienstanbieter TeamMessage.de an.*

@@ -11,9 +11,9 @@ Willkommen zur detaillierten Anleitung für die SNO TeamMessage Integration. Die
 
 ## Inhaltsverzeichnis
 1. [Vorbereitungen (TeamMessage.de)](#1-vorbereitungen-teammessagede)
-2. [Installation (HACS & Manuell)](#2-installation)
+2. [Installation (HACS & Manuell)](#2-installation-hacs--manuell)
 3. [Einrichtung in Home Assistant](#3-einrichtung-in-home-assistant)
-4. [Das TeamMessage Panel (Seitenleiste) im Detail](#4-das-teammessage-panel-seitenleiste-im-detail)
+4. [Das TeamMessage Panel im Detail](#4-das-teammessage-panel-im-detail)
 5. [Dashboard-Karten & Sensoren hinzufügen](#5-dashboard-karten--sensoren-hinzufügen)
 6. [Nutzung in Automatisierungen (Der Dienst)](#6-nutzung-in-automatisierungen-der-dienst)
 7. [Praktische Beispiele für Automatisierungen](#7-praktische-beispiele-für-automatisierungen)
@@ -30,13 +30,13 @@ Bevor du die Integration in Home Assistant nutzen kannst, benötigst du einen Ac
 3. **API-Token generieren:**
    * Navigiere im TeamMessage-Portal zu den **Einstellungen** -> **Schnittstellen / API**.
    * Erstelle dort einen neuen **API-Token (Bearer Token)**.
-   * Kopiere diesen Token. **Achtung:** Er wird dir meist nur einmal vollständig angezeigt!
+   * Kopiere diesen Token. **Achtung:** Er wird dir aus Sicherheitsgründen nur einmal vollständig angezeigt!
 
 ---
 
-## 2. Installation
+## 2. Installation (HACS & Manuell)
 
-Du kannst die Integration auf zwei Wegen in Home Assistant installieren: über den Community Store (HACS) oder manuell.
+Du kannst die Integration auf zwei Wegen in Home Assistant installieren: bequem über den Community Store (HACS) oder manuell.
 
 ### Option A: Installation über HACS (Empfohlen)
 Da es sich um ein Custom Repository handelt, musst du es HACS zunächst bekannt machen:
@@ -45,16 +45,16 @@ Da es sich um ein Custom Repository handelt, musst du es HACS zunächst bekannt 
 3. Klicke oben rechts auf das Menü (die drei Punkte) und wähle **Benutzerdefinierte Repositorys**.
 4. Trage im Feld *Repository* die URL ein: `https://github.com/SyncNetOps/int_SNO_teammessage`
 5. Wähle im Dropdown-Menü *Kategorie* den Eintrag **Integration** aus und klicke auf *Hinzufügen*.
-6. Suche nun in HACS nach `SNO - TeamMessage`, klicke auf die Integration und unten rechts auf **Herunterladen**.
-7. **Wichtig:** Starte Home Assistant nach dem Herunterladen neu!
+6. Suche nun in HACS nach `SNO - TeamMessage`, öffne die Integration und klicke unten rechts auf **Herunterladen**.
+7. **Wichtig:** Starte Home Assistant nach dem Herunterladen zwingend neu!
 
 ### Option B: Manuelle Installation
 1. Gehe auf die [GitHub-Seite des Repositories](https://github.com/SyncNetOps/int_SNO_teammessage).
 2. Lade dir den Code über den grünen Button *Code* -> *Download ZIP* herunter.
-3. Entpacke die ZIP-Datei.
-4. Navigiere auf deinem Home Assistant Gerät (z.B. per Samba Share oder File Editor) in den Ordner `config/custom_components/`. *(Falls der Ordner nicht existiert, erstelle ihn).*
+3. Entpacke die ZIP-Datei lokal auf deinem Rechner.
+4. Navigiere auf deinem Home Assistant System (z.B. per Samba Share, SSH oder File Editor Add-on) in den Ordner `config/custom_components/`. *(Falls der Ordner `custom_components` nicht existiert, erstelle ihn).*
 5. Kopiere den gesamten Ordner `sno_teammessage` aus der entpackten ZIP-Datei in das Verzeichnis `custom_components`.
-6. **Wichtig:** Starte Home Assistant neu!
+6. **Wichtig:** Starte Home Assistant zwingend neu!
 
 ---
 
@@ -74,88 +74,206 @@ Im ersten Fenster wirst du nach deinen Zugangsdaten gefragt:
 Klicke auf *Senden*. Die Integration prüft nun live im Hintergrund, ob die Zugangsdaten korrekt sind. Ist alles grün, bist du verbunden!
 
 ### 3.2 Smarte Fallbacks (Optionen)
-Nach der Installation kannst du über den Button **Konfigurieren** (in der Integrations-Übersicht) die sogenannten *Smarten Fallbacks* festlegen. Diese Werte werden immer dann genutzt, wenn du in einer Automatisierung vergisst, sie explizit anzugeben.
-* **Standard Teamliste:** Wähle hier die ID (z.B. `108975`) oder E-Mail deiner primären Liste.
-* **Standard Absender-E-Mail:** Trage hier deine E-Mail ein. Dies ist zwingend nötig, wenn du an "Geschlossene Gruppen" sendest.
-* **Standard Keyword:** Wenn deine Teamliste passwortgeschützt ist, trage es hier ein.
+Nach der Installation kannst du über den Button **Konfigurieren** (in der Integrations-Übersicht unter Einstellungen -> Geräte & Dienste) die sogenannten *Smarten Fallbacks* festlegen. 
+
+| Einstellungsfeld | Beschreibung | Praxis-Beispiel |
+| :--- | :--- | :--- |
+| **Standard Teamliste** | ID oder E-Mail deiner primären Liste. Wird genutzt, wenn im Dienst das Feld `teamlist_email` leer bleibt. | *Du baust ein Alarmsystem für die Familie. Trage hier die Listen-ID "Familie" ein. In deinen YAML-Codes musst du die Liste ab sofort nie wieder abtippen.* |
+| **Standard Absender-E-Mail** | Deine Autorisations-E-Mail. Zwingend nötig für "Geschlossene Gruppen". | *Trage hier z.B. `vater@haus.de` ein. So autorisiert sich Home Assistant bei geschlossenen Listen immer automatisch.* |
+| **Standard Keyword** | Das Passwort für geschlossene Listen. | *Trage hier `AlarmPW123` ein. Du musst dieses Passwort nun nicht mehr in jede einzelne Automatisierung schreiben.* |
 
 ---
 
-## 4. Das TeamMessage Panel (Seitenleiste) im Detail
+## 4. Das TeamMessage Panel im Detail
 
 Die Integration fügt deinem Home Assistant in der linken Seitenleiste ein neues Menü namens **TeamMessage** hinzu. Dieses hochmoderne "Glassmorphism"-Panel ist in mehrere Tabs unterteilt:
 
 ### 4.1 Dashboard
-Hier siehst du auf einen Blick den Status deines Accounts:
-* **Verfügbares Guthaben:** Deine noch verbleibenden SMS (bei Prepaid/EASY-Tarifen).
-* **Gesendet Gesamt:** Wie viele Nachrichten historisch über deinen Account liefen.
-* **Aktiver Tarif:** Zeigt dir, ob du z.B. einen `EASY` oder `PROFI`-Tarif nutzt.
+Hier siehst du auf einen Blick den Status deines Accounts.
+* **Funktionen:** Anzeige von Guthaben (Prepaid), historisch gesendeten Nachrichten und deinem Tarifmodell.
+* **Praxis-Beispiel:** Bevor du in den Urlaub fährst, wirfst du einen Blick auf das Dashboard. Steht das Guthaben auf "3", weißt du, dass du dein Prepaid-Konto beim Anbieter aufladen musst, damit Alarme zugestellt werden können.
 
 ### 4.2 Senden
 Dieser Tab ist ideal, um Nachrichten manuell zu testen, ohne erst eine Automatisierung schreiben zu müssen.
-* **Typ:** Wähle zwischen `An Teamliste / Gruppe` oder `Direkt an Handynummer`.
-* **Ziel:** Wählst du eine Gruppe, erscheint ein Dropdown mit all deinen im Portal angelegten Listen. Wählst du Direkt, erscheint ein Textfeld für die Handynummer.
-* **Zusätzliche Listen-Authentifizierung:** (Erscheint nur bei der Auswahl "Listen"). Hier kannst du temporär das Keyword und die E-Mail eingeben, falls die Gruppe geschlossen ist.
-* **Bevorzugter Kanal:** Gilt nur für den Direktversand! Wähle, ob der Empfänger eine `SMS Textnachricht` oder einen automatisierten `Sprachanruf (Voice)` erhalten soll.
-* **Nachricht:** Dein gewünschter Alarm- oder Infotext.
+* **Funktionen:** Formular für Direkt- oder Gruppenversand inklusive Kanal-Auswahl (SMS/Voice).
+* **Praxis-Beispiel:** Du bist auf der Arbeit und merkst, dass du deinen Haustürschlüssel vergessen hast. Du öffnest die HA-App, gehst ins Panel und schickst manuell einen "Voice Call" an die Teamliste "Nachbarn", damit jemand nach dem Rechten sieht.
 
 ### 4.3 Logbuch
 Das Herzstück der Fehleranalyse. Hier siehst du live, was mit deinen Nachrichten passiert ist.
-* **Status-Icons:** Ein grüner Haken bedeutet "Zugestellt". Eine orange Sanduhr bedeutet "Wird verarbeitet". Ein rotes Ausrufezeichen bedeutet "Fehler".
-* **Akkordeon-Klick:** Klicke auf einen beliebigen Eintrag, um alle Details auszuklappen. Du siehst dann den genauen Statuscode (z.B. `-6` für ungültige Handynummer) und das verwendete Mobilfunknetz (Telekom, Vodafone etc.).
-* **Einstellungen (Zahnrad):** Oben rechts im Logbuch kannst du einstellen, dass sich das Logbuch automatisch (z.B. alle 30 Sekunden) aktualisiert.
+* **Funktionen:** Live-Anzeige von Zustellstatus (Haken, Sanduhr, Fehler), Filterfunktion und Auto-Refresh.
+* **Praxis-Beispiel:** Deine Automatisierung hat nachts ausgelöst, aber dein Partner hat keine SMS bekommen. Im Logbuch filterst du nach seiner Handynummer. Klickst du auf den Eintrag, siehst du den Fehlercode `-6` (ungültige Handynummer) und erkennst, dass du in den Kontakten einen Zahlendreher hast.
 
 ### 4.4 Kontakte
-Hier verwaltest du die Mitglieder deiner Teamlisten direkt aus Home Assistant heraus, ohne dich ins Webportal einloggen zu müssen!
-* Wähle oben im Dropdown eine deiner Teamlisten und klicke auf **Laden**.
-* Du siehst alle aktuellen Mitglieder. Du kannst sie über den Button **Edit** bearbeiten oder über **+ Neu** jemanden hinzufügen.
-* **Zustellkanal:** Du kannst für jede Person einzeln festlegen, ob sie primär per SMS, Voice oder E-Mail benachrichtigt werden soll.
+Hier verwaltest du die Mitglieder deiner Teamlisten direkt aus Home Assistant heraus!
+* **Funktionen:** Kontakte laden, erstellen, bearbeiten und löschen.
+* **Praxis-Beispiel:** Dein Nachbar hat eine neue Handynummer. Anstatt dich am PC ins TeamMessage-Portal einzuloggen, öffnest du am Smartphone die HA-App, gehst auf "Kontakte", wählst die Liste "Nachbarn" aus, klickst beim Nachbarn auf "Edit" und aktualisierst die Nummer.
 
 ### 4.5 Einstellungen
-Hier kannst du die *Smarten Fallbacks* (siehe Punkt 3.2) bequem über die grafische Oberfläche ändern und speichern.
+Hier kannst du die *Smarten Fallbacks* (siehe Punkt 3.2) bequem über die grafische Oberfläche ändern und speichern, ohne in die Integrationen-Einstellungen von Home Assistant wechseln zu müssen.
 
 ---
 
 ## 5. Dashboard-Karten & Sensoren hinzufügen
 
-Die Integration stellt dir out-of-the-box drei Sensoren zur Verfügung, die du auf jedem Home Assistant Dashboard visualisieren kannst (`credit`, `used` und `tariff`).
-
-Zusätzlich bringt die Integration eigene, maßgeschneiderte Dashboard-Karten (Custom Cards) mit, die bei der Installation automatisch mit heruntergeladen wurden. Bevor du diese auf deinem Dashboard nutzen kannst, musst du sie in Home Assistant als Ressource registrieren.
+Die Integration stellt dir out-of-the-box Sensoren zur Verfügung, die du auf jedem Dashboard visualisieren kannst (`credit`, `used`, `tariff`). Zusätzlich bringt die Integration maßgeschneiderte **Dashboard-Karten (Custom Cards)** mit.
 
 ### 5.1 Custom Cards (Ressourcen) registrieren
 
 **Schritt 1: So machst du die Karten sichtbar**
 1. Gehe in Home Assistant in der Seitenleiste zu **Einstellungen** -> **Dashboards**.
-2. Klicke oben rechts auf die drei Punkte (`...`) und wähle **Ressourcen**.
-   *(Hinweis: Falls du den Punkt "Ressourcen" nicht siehst, musst du unter deinem Benutzerprofil den "Erweiterten Modus" aktivieren).*
-3. Klicke unten rechts auf den Button **Ressource hinzufügen**.
-4. Trage in das Feld URL exakt folgende Zeile ein: 
-   `/local/sno-teammessage/teammessage-cards.js?v=1`
+2. Klicke oben rechts auf die drei Punkte (`...`) und wähle **Ressourcen**. *(Hinweis: Aktiviere vorher den "Erweiterten Modus" in deinem Benutzerprofil).*
+3. Klicke unten rechts auf **Ressource hinzufügen**.
+4. Trage exakt folgende URL ein: `/local/sno-teammessage/teammessage-cards.js?v=1`
 5. Wähle als Ressourcentyp **JavaScript Modul** und klicke auf **Erstellen**.
 
-💡 **Profitipp (Cache leeren):** Wenn die Entwickler ein Update der Karten herausbringen, ändere in der Ressourcen-Verwaltung einfach die Endung auf `?v=2` oder `?v=3`, um den Browser-Cache zum sofortigen Neuladen der neuen Version zu zwingen!
+> **💡 Profitipp (Cache leeren):** Wenn es ein Update der Karten gibt, ändere in der URL einfach die Endung auf `?v=2` oder `?v=3`. Das zwingt den Browser auf allen Handys und Tablets, die neue Version sofort zu laden!
 
-### 5.2 Karten zum Dashboard hinzufügen (Lovelace)
+### 5.2 Karten auf dem Dashboard platzieren (Lovelace)
+1. Gehe auf dein gewünschtes Dashboard und klicke oben rechts auf das Stift-Symbol (Dashboard bearbeiten).
+2. Klicke auf **Karte hinzufügen** und scrolle ganz nach unten. Dort findest du vier neue, grafische Karten:
+   * **TeamMessage Guthaben:** Optischer Ring mit Statistik.
+   * **TeamMessage Senden:** Schnellversand-Formular für dein Haupt-Dashboard.
+   * **TeamMessage Logs:** Interaktives Logbuch für Admin-Dashboards.
+   * **TeamMessage Statistik:** Minimalistische Anzeige.
+3. Wähle eine Karte aus. Trage im visuellen Editor zwingend deine Team-ID (`tm`) ein.
 
-Sobald die Ressource registriert ist, kannst du die Karten in dein Dashboard einbauen.
-1. Gehe auf dein gewünschtes Dashboard.
-2. Klicke oben rechts auf das Stift-Symbol (Dashboard bearbeiten).
-3. Klicke auf **Karte hinzufügen**.
-4. Wenn du die Custom Card des Entwicklers nutzt, suche in der Liste nach der spezifischen TeamMessage-Karte oder nutze die reguläre Entitäten-Karte.
+---
 
-**YAML-Code für eine schöne, reguläre Status-Karte:**
-Wenn du den Code-Editor (YAML) im Dashboard bevorzugst, kannst du diesen Block nutzen, um deine Account-Sensoren formschön darzustellen *(Ersetze `12345` durch deine eigene Team-ID)*:
+## 6. Nutzung in Automatisierungen (Der Dienst)
+
+Der Hauptzweck dieser Integration ist es, dich automatisch über Ereignisse in deinem Smart Home zu informieren. Dies geschieht über den Dienst `sno_teammessage.send_message`.
+
+
+
+### Vollständige Tabelle aller Eingabefelder (Parameter)
+
+Die folgende Tabelle beschreibt alle verfügbaren Konfigurationsmöglichkeiten des Dienstes.
+
+| Parameter (`Feldname`) | Typ | Erforderlich | Beschreibung & Erklärung | Praxis-Beispiel |
+| :--- | :--- | :--- | :--- | :--- |
+| **Versandart** (`target_type`) | Auswahl | **Ja** | Bestimmt die Routing-Logik der API. `direct` für eine einzelne Handynummer, `list` für eine Gruppe. | *Wähle `list`, wenn du den Rauchalarm an die gesamte Familie senden willst.* |
+| **Nachricht** (`message`) | Text | **Ja** | Der Inhalt deiner Nachricht (max. 1600 Zeichen). Unterstützt HA-Templates. | *`ALARM! Wohnzimmerfenster wurde geöffnet.`* |
+| **Zielrufnummer** (`to_mobile`) | Text | Bei `direct` | Die Handynummer des Empfängers im internationalen Format (z.B. +49...). | *Trage `+491701234567` ein, wenn dein Partner direkt informiert werden soll.* |
+| **Teamliste** (`teamlist_email`) | Text | Bei `list` | Die ID (oder E-Mail) deiner Gruppe. Bleibt das Feld leer, greift der Smarte Fallback. | *Trage `108975` ein, um die Nachricht an die IT-Abteilung zu senden.* |
+| **Bevorzugter Kanal** (`channel`) | Auswahl | Nein | Gilt nur für `direct`. Wähle `sms` (Text) oder `voice` (Sprachanruf). | *Wähle `voice` für einen kritischen Nacht-Alarm. Das Telefon klingelt durch!* |
+| **Keyword** (`keyword`) | Text | Bedingt | Passwort für die Teamliste, falls diese im Webportal als "Geschlossene Gruppe" definiert ist. | *Trage `Geheim123` ein, damit die API die Nachricht nicht wegen fehlender Rechte abweist.* |
+| **Absender E-Mail** (`sender_email`) | Text | Bedingt | E-Mail-Adresse für die Authentifizierung bei "Geschlossenen Gruppen". | *Trage `admin@smarthome.de` ein. Muss einem Mitglied der Liste gehören.* |
+| **Absenderkennung** (`from_mobile`) | Text | Nein | Überschreibt den SMS-Absender auf dem Handydisplay (max. 11 Zeichen, alphanumerisch). | *Trage `SmartHome` ein. Auf dem Handy erscheint dann "SmartHome" statt einer Nummer.* |
+| **Datum** (`date`) | Text | Nein | Erlaubt den geplanten Versand in der Zukunft (Format: YYYY-MM-DD). | *Trage `2026-12-24` ein, um Weihnachtsgrüße an alle Mitarbeiter vorzuplanen.* |
+| **Uhrzeit** (`time`) | Text | Nein | Sende-Uhrzeit für den geplanten Versand (Format: HH:MM). | *Trage `08:00` ein, damit die Nachtschicht-Statistik erst morgens ankommt.* |
+| **Flash-Nachricht** (`flash`) | Boolean | Nein | Aktiviert (`true`), poppt die SMS direkt auf dem Display des Empfängers auf und speichert sich nicht im Posteingang. | *Nutze `true` für simple Infos wie "Waschmaschine ist fertig", um den Speicher nicht zu zumüllen.* |
+| **Test-Modus** (`test`) | Boolean | Nein | Aktiviert (`true`), durchläuft die API alle Validierungen, sendet die Nachricht aber nicht echt ab (Guthaben wird gespart). | *Nutze `true` während du neue HA-Automatisierungen baust und testest.* |
+| **UCS2 Encoding** (`ucs2`) | Boolean | Nein | Erzwingt Unicode. Nötig für Emojis oder spezielle Sonderzeichen. | *Nutze `true`, wenn du Emojis wie 🚨 oder ❄️ in deiner Nachricht verwendest.* |
+
+---
+
+## 7. Praktische Beispiele für Automatisierungen
+
+Hier sind fertige YAML-Codeschnipsel für typische Szenarien. Du kannst diese im visuellen Editor von Home Assistant unter "Automatisierungen" per Klick auf "YAML bearbeiten" einfügen.
+
+### Beispiel 1: Direkte SMS bei Wasseralarm
+Wenn der Wassersensor Feuchtigkeit meldet, schickt HA sofort eine SMS an den Hausbesitzer. Der Absendername wird auf "HomeAssist" geändert.
 
 ```yaml
-type: entities
-title: TeamMessage Status
-entities:
-  - entity: sensor.sno_teammessage_12345_credit
-    name: SMS Guthaben
-    icon: mdi:message-badge
-  - entity: sensor.sno_teammessage_12345_used
-    name: Gesendet (Gesamt)
-    icon: mdi:message-arrow-right
-  - entity: sensor.sno_teammessage_12345_tariff
-    name: Aktueller Tarif
-    icon: mdi:card-account-details
+alias: "Alarm: Wasserschaden SMS"
+trigger:
+  - platform: state
+    entity_id: binary_sensor.wassersensor_keller
+    to: "on"
+action:
+  - action: sno_teammessage.send_message
+    data:
+      target_type: "direct"
+      to_mobile: "+491701234567"
+      channel: "sms"
+      message: "🚨 ALARM: Der Wassersensor im Keller hat Wasser registriert!"
+      from_mobile: "HomeAssist"
+      ucs2: true # Aktiviert für das Sirenen-Emoji
+```
+
+### Beispiel 2: Einbruchalarm als Sprachanruf (Voice)
+Nachts überhört man schnell eine SMS. Ein echter Anruf auf dem Handy weckt jeden auf. Der eingegebene Text wird dem Angerufenen von einer Computerstimme am Telefon vorgelesen!
+
+```yaml
+alias: "Alarm: Einbruch Voice Call"
+trigger:
+  - platform: state
+    entity_id: binary_sensor.haustur_kontakt
+    to: "on"
+condition:
+  - condition: time
+    after: "23:00:00"
+    before: "06:00:00"
+action:
+  - action: sno_teammessage.send_message
+    data:
+      target_type: "direct"
+      to_mobile: "+491609876543"
+      channel: "voice"
+      message: "Achtung. Kritische Systemwarnung. Die Haustür wurde soeben geöffnet."
+```
+
+### Beispiel 3: Information an das gesamte Team (Geschlossene Gruppe)
+Der Server ist offline. Alle Personen auf deiner Teamliste (ID 108975) sollen parallel informiert werden. Die Liste ist aus Sicherheitsgründen "geschlossen", benötigt also Auth-Daten.
+
+```yaml
+alias: "Info: System offline an Team"
+trigger:
+  - platform: state
+    entity_id: binary_sensor.server_status
+    to: "off"
+    for:
+      minutes: 5
+action:
+  - action: sno_teammessage.send_message
+    data:
+      target_type: "list"
+      teamlist_email: "108975"
+      message: "SERVER OFFLINE: Der Hauptserver ist seit 5 Minuten nicht erreichbar."
+      keyword: "IT-Sicherheit123"
+      sender_email: "admin@meinnetzwerk.de"
+```
+
+### Beispiel 4: Geplanter Versand mit Flash-SMS
+Die Waschmaschine ist fertig. Du möchtest die Info als Flash-SMS (poppt sofort über allen Apps auf) senden, aber erst um 16:00 Uhr, wenn du Feierabend hast.
+
+```yaml
+alias: "Info: Waschmaschine (Planung)"
+trigger:
+  - platform: state
+    entity_id: sensor.waschmaschine_status
+    to: "Fertig"
+action:
+  - action: sno_teammessage.send_message
+    data:
+      target_type: "direct"
+      to_mobile: "+491701234567"
+      message: "Die Waschmaschine ist fertig und kann ausgeräumt werden."
+      flash: true
+      time: "16:00"
+```
+
+---
+
+## 8. Fehlerbehebung & FAQ
+
+Die Integration ist stark fehlertolerant aufgebaut, dennoch kann es bei falschen Eingaben zu Rückmeldungen der API kommen. Hier sind die häufigsten Lösungen:
+
+**Fehler: `invalid_to_mobile`**
+* **Ursache:** Die API fordert zwingend eine Handynummer, es wurde aber keine gesendet.
+* **Lösung:** Prüfe, ob du im Dienst die Versandart (`target_type`) auf `Direkt an Handynummer` gestellt hast und das Feld `to_mobile` mit einer korrekten Nummer (inklusive Ländervorwahl, z.B. `+49...`) gefüllt ist.
+
+**Fehler: `closed_group_auth`**
+* **Ursache:** Du versuchst an eine Teamliste zu senden, die vom Anbieter im Portal als "Geschlossene Gruppe" gesichert ist. Die Integration hat sich beim Senden nicht korrekt ausgewiesen.
+* **Lösung:** Wähle im Dienst als Versandart `An Gruppe / Teamliste` und fülle zwingend die Felder `Keyword` und `Absender E-Mail` aus. Die verwendete E-Mail muss einem echten Mitglied dieser Liste gehören.
+
+**Fehler: `Fehler beim Auflösen der Listenmitglieder`**
+* **Ursache:** Die Integration versucht vor dem Gruppenversand, die Nummern deiner Teammitglieder asynchron von der API abzufragen. Dies schlägt fehl, wenn die Listen-ID (`teamlist_email`) nicht existiert oder in dieser Liste niemand den Kanaltyp SMS oder Voice zugeordnet hat.
+* **Lösung:** Gehe ins TeamMessage Panel -> Tab "Kontakte" und überprüfe, ob die Mitglieder korrekt angelegt sind und im Dropdown "Zustellkanal" auf "SMS" oder "Voice" stehen. E-Mail-Kontakte werden hierbei ignoriert.
+
+**Verbindungsfehler oder Timeouts**
+* **Ursache:** Home Assistant kann den Server von TeamMessage nicht erreichen.
+* **Lösung:** Stelle sicher, dass dein Home Assistant-Host über eine aktive Internetverbindung verfügt und DNS-Anfragen an `api.teammessage.de` nicht durch lokale Adblocker (wie Pi-Hole oder AdGuard Home) blockiert werden.
+
+**Wo finde ich noch mehr Hilfe?**
+Besuche unsere ausführliche Online-Doku und FAQ unter: [sno.mb222.de/faq-tm/](https://sno.mb222.de/faq-tm/) oder erstelle ein technisches Issue in unserem [GitHub Repository](https://github.com/SyncNetOps/int_SNO_teammessage/issues).
